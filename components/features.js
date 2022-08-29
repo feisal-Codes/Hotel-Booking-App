@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
-function Features() {
+function Features({onPress}) {
   return (
     <ScrollView style={styles.main}>
       <View style={styles.main}>
@@ -12,7 +12,7 @@ function Features() {
             <Pressable
               style={styles.sParent}
               onPress={() => {
-                alert("pressed");
+              console.log("hey")
               }}
             >
               <Ionicons name="location" size={40} style={styles.icons} />
@@ -23,7 +23,7 @@ function Features() {
           <Pressable
               style={styles.sParent}
               onPress={() => {
-                alert("pressed");
+                onPress("Roomtypes")
               }}
             >
             <FontAwesome name="hotel" size={40} style={styles.icons} />
@@ -98,13 +98,13 @@ const styles = StyleSheet.create({
   main_container: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     marginVertical: 5,
   },
  
   parent: {
-    height: 120,
-    width: "30%",
+    height: 100,
+    width: "25%",
     marginRight: 1,
     alignItems: "center",
     justifyContent: "center",

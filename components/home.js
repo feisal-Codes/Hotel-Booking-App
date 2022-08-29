@@ -1,15 +1,31 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
-import { StatusBar } from "expo-status-bar";
+import { View, Text, Image, StyleSheet,ScrollView } from "react-native";
 
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import Features from "./features";
 
-function Home() {
+
+
+
+
+
+
+
+
+
+
+
+
+function Home({navigation}) {
+
+function handlePress(name,val){
+   navigation.navigate(name,val)
+}
+
   return (
     <>
      
-      <View style={styles.main}>
+      <ScrollView style={styles.main}>
         <View>
           <Image
             source={require("../assets/images/hotel.jpg")}
@@ -50,9 +66,9 @@ function Home() {
           </View>
         </View>
         <View  style={{flex:1, padding:5}}>
-          <Features/>
+          <Features onPress={handlePress}/>
         </View>
-      </View>
+      </ScrollView>
     </>
   );
 }
@@ -75,11 +91,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   text: {
-    fontSize: 26,
+    fontSize: 22,
     padding: 5,
   },
   secondary_text: {
-    fontSize: 18,
+    fontSize: 16,
     padding: 5,
   },
   icons: {
