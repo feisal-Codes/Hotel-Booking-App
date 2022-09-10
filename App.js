@@ -4,6 +4,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
+import { en, enGB, registerTranslation } from "react-native-paper-dates";
+
+// import { Provider } from "react-redux";
+
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 
@@ -13,9 +17,11 @@ import Contact from "./components/contact";
 import Home from "./components/home";
 import RoomType from "./screens/roomTypes";
 import colors from "./util/colors";
-import Book from "./components/book";
+import Book from "./screens/book";
 import Settings from "./components/settings";
-import { Provider as PaperProvider } from "react-native-paper";
+
+// import { store } from "./store/store";
+
 import RoomDetails from "./screens/roomDetails";
 import {
   StyleSheet,
@@ -28,31 +34,68 @@ import {
   Pressable,
   ScrollView,
 } from "react-native";
+import Login from "./screens/login";
+import Register from "./screens/register";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
+registerTranslation("en", en);
+registerTranslation("en-GB", enGB);
+
+// if (Platform.OS === "android") {
+//   // See https://github.com/expo/expo/issues/6536 for this issue.
+//   if (typeof (Intl).__disableRegExpRestore === "function") {
+//       (Intl).__disableRegExpRestore();
+//   }
+// }
+
 function MyStackScreens() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator> 
       <Stack.Screen
         name="types"
         component={RoomType}
         options={{
-          title: "Type Of Rooms",
+          title: "Type Rooms",
           headerShown: false,
+          contentStyle: {
+            backgroundColor: "#e6e9ed",
+          },
         }}
       />
-      <Stack.Screen name="details" component={RoomDetails}
-      options={
-        {
-          headerTitleAlign:"center",
-          headerStyle:{
-            backgroundColor:"#e6e9ed"
-          }
-        }
-      }
-      
+      <Stack.Screen
+        name="details"
+        component={RoomDetails}
+        options={{
+          headerTitleAlign: "center",
+          headerStyle: {
+            backgroundColor: "#e6e9ed",
+          },
+          contentStyle: {
+            backgroundColor: "#e6e9ed",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="book"
+        component={Book}
+        options={{
+          headerTitleAlign: "center",
+          headerStyle: {
+            backgroundColor: "#e6e9ed",
+            
+          },
+          contentStyle: {
+            backgroundColor: "#e6e9ed",
+          },
+          headerTintColor:{
+            color:"white"
+          },
+          // contentStyle: {
+          //   backgroundColor: "#e6e9ed",
+          // },
+        }}
       />
     </Stack.Navigator>
   );
@@ -62,7 +105,6 @@ export default function App() {
   return (
     <>
       <StatusBar style="dark" />
-
       <NavigationContainer>
         <Drawer.Navigator
           screenOptions={{
@@ -75,13 +117,28 @@ export default function App() {
             drawerContentStyle: {
               backgroundColor: "#ffffff",
               paddingTop: 15,
-              width: "100%",
             },
           }}
         >
           <Drawer.Screen
             name="Home"
             component={Home}
+            options={{
+              contentStyle: {
+                // backgroundColor: "red",
+              },
+              drawerIcon: ({ focused, size }) => (
+                <Ionicons
+                  name="md-home"
+                  size={size}
+                  color={focused ? "blue" : "#ccc"}
+                />
+              ),
+            }}
+          />
+          <Drawer.Screen
+            name="login"
+            component={Login}
             options={{
               contentStyle: {
                 backgroundColor: "red",
@@ -93,9 +150,26 @@ export default function App() {
                   color={focused ? "blue" : "#ccc"}
                 />
               ),
+              headerShown: false,
             }}
           />
-
+          <Drawer.Screen
+            name="register"
+            component={Register}
+            options={{
+              contentStyle: {
+                backgroundColor: "red",
+              },
+              drawerIcon: ({ focused, size }) => (
+                <Ionicons
+                  name="md-home"
+                  size={size}
+                  color={focused ? "blue" : "#ccc"}
+                />
+              ),
+              headerShown: false,
+            }}
+          />
           <Drawer.Screen
             name="Roomtypes"
             component={MyStackScreens}
@@ -105,20 +179,23 @@ export default function App() {
                 <Ionicons name="bed-outline" size={size} color={color} />
               ),
               headerShown:
-                getFocusedRouteNameFromRoute(route) == "details" ? false : true,
+                getFocusedRouteNameFromRoute(route) == "details" ||
+                getFocusedRouteNameFromRoute(route) == "book"
+                  ? false
+                  : true,
             })}
           />
-
           <Drawer.Screen
-            name="Bookings"
-            component={Book}
-            options={{
-              backgroundColor: "#e6e9ed",
-              drawerIcon: ({ focused, size, color }) => (
-                <Ionicons name="receipt-outline" size={size} color={color} />
-              ),
-            }}
-          />
+              name="Bookings"
+              component={Book}
+              options={{
+                backgroundColor: "#e6e9ed",
+                drawerIcon: ({ focused, size, color }) => (
+                  <Ionicons name="receipt-outline" size={size} color={color} />
+                ),
+                headerShown:false
+              }}
+            />
           <Drawer.Screen
             name="Location"
             component={Contact}

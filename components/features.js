@@ -14,9 +14,9 @@ function Features({onPress}) {
               onPress={() => {
               console.log("hey")
               }}
-            >
-              <Ionicons name="location" size={40} style={styles.icons} />
-              <Text style={styles.text}>Location</Text>
+            > 
+              <Ionicons name="ios-calendar-outline" size={40} style={styles.icons} />
+              <Text style={styles.text}>Book Now!</Text>
             </Pressable>
           </LinearGradient>
           <LinearGradient style={styles.parent} colors={["blue", "#00308F"]}>
@@ -52,8 +52,8 @@ function Features({onPress}) {
               }}
               android_ripple={{color:"white"}}
             >
-            <FontAwesome name="photo" size={40} style={styles.icons} />
-            <Text style={styles.text}>Gallery</Text>
+             <Ionicons name="location" size={40} style={styles.icons} />
+              <Text style={styles.text}>Location</Text>
             </Pressable>
           </LinearGradient>
           <LinearGradient style={styles.parent} colors={["#0066b2", "#002D62"]}>
@@ -103,8 +103,8 @@ const styles = StyleSheet.create({
   },
  
   parent: {
-    height: 100,
-    width: "25%",
+    height: 80,
+    width: "23%",
     marginRight: 1,
     alignItems: "center",
     justifyContent: "center",

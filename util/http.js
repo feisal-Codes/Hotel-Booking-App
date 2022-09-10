@@ -1,6 +1,7 @@
 import axios from "axios";
 
-let url = "http://192.168.100.10:3001/rooms?type=";
+let url = "http://192.168.43.202:3001/rooms?type=";
+
 
 export async function getRoomsData(name) {
   try {

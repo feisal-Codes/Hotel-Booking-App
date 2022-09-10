@@ -23,7 +23,7 @@ const RoomType = () => {
   const [ddata, setDdata] = useState(null);
   // const [edata, setEdata] = useState(null);
   const [vdata, setVdata] = useState(null);
-
+  console.log(sdata);
   useEffect(() => {
     try {
       fetchData();
@@ -53,15 +53,26 @@ const RoomType = () => {
     );
   }
 
+  const handlePress = ({ roomname, roomdata }) => {
+    console.log(
+      "***********************************this is the room name************************"
+    );
+    console.log(roomname, roomdata);
+    Navigate.navigate("details", {
+      data: roomdata.data,
+      name: roomname,
+      price: roomdata.price,
+    });
+  };
+
   return (
     <View style={styles.main}>
       <ScrollView style={{ height: "100%" }}>
         <Pressable
-          onPress={() => {
-            Navigate.navigate("details", {
-              data: sdata.data,
-            });
-          }}
+          onPress={handlePress.bind(this, {
+            roomname: "Standard Room",
+            roomdata: sdata,
+          })}
         >
           <ImageBackground
             style={styles.parent}
@@ -76,9 +87,10 @@ const RoomType = () => {
           </ImageBackground>
         </Pressable>
         <Pressable
-          onPress={() => {
-            Alert.alert("clicked");
-          }}
+          onPress={handlePress.bind(this, {
+            roomname: "Deluxe Room",
+            roomdata: ddata,
+          })}
         >
           <ImageBackground
             style={styles.parent}
@@ -110,9 +122,10 @@ const RoomType = () => {
           </ImageBackground>
         </Pressable>
         <Pressable
-          onPress={() => {
-            Alert.alert("clicked");
-          }}
+          onPress={handlePress.bind(this, {
+            roomname: "VIP Room",
+            roomdata: vdata,
+          })}
         >
           <ImageBackground
             style={styles.parent}

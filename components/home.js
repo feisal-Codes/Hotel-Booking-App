@@ -1,35 +1,30 @@
 import React from "react";
-import { View, Text, Image, StyleSheet,ScrollView } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView,SafeAreaView } from "react-native";
 
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import Features from "./features";
+import { StatusBar } from "expo-status-bar";
+
+
+function Home({ navigation }) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-function Home({navigation}) {
-
-function handlePress(name,val){
-   navigation.navigate(name,val)
-}
+  function handlePress(name) {
+    console.log("#####################################################")
+    console.log(name)
+    console.log("needed name")
+    navigation.navigate(name);
+  }
 
   return (
     <>
-     
+<SafeAreaView style={styles.main}>
       <ScrollView style={styles.main}>
         <View>
           <Image
             source={require("../assets/images/hotel.jpg")}
-            style={{ width: "100%", height: 250 }}
+            style={{ width: "100%", height: 200 }}
           />
         </View>
         <View style={styles.main_address}>
@@ -65,10 +60,11 @@ function handlePress(name,val){
             </Text>
           </View>
         </View>
-        <View  style={{flex:1, padding:5}}>
-          <Features onPress={handlePress}/>
-        </View>
+        <View style={{ flex: 1, padding: 5 }}>
+          <Features onPress={handlePress} />
+        </View> 
       </ScrollView>
+      </SafeAreaView>
     </>
   );
 }
@@ -78,13 +74,12 @@ export default Home;
 const styles = StyleSheet.create({
   main: {
     padding: 20,
-    paddingTop:0,
+    paddingTop: 0,
     paddingHorizontal: 0,
     flex: 1,
   },
   main_address: {
-  
-    backgroundColor:"#f5f6f7",
+    backgroundColor: "#f5f6f7",
     padding: 20,
     marginHorizontal: 10,
     marginTop: -20,
