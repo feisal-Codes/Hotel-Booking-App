@@ -1,7 +1,8 @@
 import axios from "axios";
 
+import { url, Loginurl, registerUrl, roomUrl, bookRoomUrl } from "./urls";
 
-
+console.log(roomUrl);
 
 export async function getRoomsData(name) {
   try {
@@ -22,6 +23,7 @@ export async function getRoomsData(name) {
   }
 }
 
+//login
 export async function postLogin({ email, password }) {
   try {
     console.log("This is the login Dta");
@@ -46,6 +48,7 @@ export async function postLogin({ email, password }) {
   }
 }
 
+//signup
 export async function postRegister({
   firstname,
   lastname,
@@ -87,13 +90,12 @@ export async function postRegister({
   }
 }
 
-export async function getRoomType() {
+export async function bookRooom() {
   try {
-    const response = await axios.get(roomUrl);
-    console.log(response.data);
-   
+    const { data } = await axios.post(bookRoomUrl);
+    return data;
   } catch (err) {
-    console.log(err);
+    console.log(err.response.data);
+    return err.response.status;
   }
 }
-

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { View, Text, ActivityIndicator, Image, StyleSheet } from "react-native";
+import { View, Text, ActivityIndicator, Image, StyleSheet, Alert } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -10,6 +10,8 @@ import moment from "moment";
 import CustomModal from "../components/customModal";
 import RoomAmenities from "../components/amenities";
 import { Button, Chip } from "@rneui/themed";
+import { bookRoomUrl } from "../util/urls";
+import { bookRooom } from "../util/http";
 
 const ratingsArray = [1, 2, 3, 4, 5];
 
@@ -73,8 +75,22 @@ const RoomDetails = ({ route, navigation }) => {
     );
   }
 
-  function bookNow() {
-    navigation.navigate("book", {});
+  async function handleBooking(type) {
+    
+
+    const bookObj= {
+      startDate:moment.utc(selectedStartDate).format("D/MM/YYYY"),
+      endDate:moment.utc(selectedEndDate).format("D/MM/YYYY"),
+      rtype:type
+    }
+
+    console.log(bookObj)
+    
+    // const res= await bookRooom()
+
+
+    // Alert.alert(bookObj)
+    
   }
 
   return (
@@ -163,6 +179,7 @@ const RoomDetails = ({ route, navigation }) => {
             title="Search for Room Availability"
             type="solid"
             color="#00308F"
+            onPress={()=>handleBooking(data.type)}
           />
         </View>
       </ScrollView>
