@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, Dimensions } from "react-native";
+import { StyleSheet, Text, View, Dimensions,ScrollView } from "react-native";
 import CalendarPicker from "react-native-calendar-picker";
 import moment from "moment";
-import { Button } from "react-native-paper";
-import { ScrollView } from "react-native-gesture-handler";
 // import { LinearGradient } from "expo-linear-gradient";
 
 const windowWidth = Dimensions.get("window").width;
@@ -65,8 +63,8 @@ console.log(params)
           selectedDayTextColor="#FFFFFF"
           onDateChange={onDateChange}
           restrictMonthNavigation={true}
-          // scrollable={true}
-          // horizontal={false}
+          scrollable={true}
+          horizontal={false}
           // showDayStragglers={true}
           nextTitle="Next Month"
           previousTitle="Previous Month"
@@ -99,14 +97,14 @@ console.log(params)
       </View>
 
       <View style={styles.custom_buttons}>
-        <Button
+        {/* <Button
           mode="contained"
           color="#00308F"
           // onPress={bookNow}
           style={styles.custom_buttons_book}
         >
           Search for Room Availability
-        </Button>
+        </Button> */}
        
       </View>
     </ScrollView>

@@ -1,27 +1,30 @@
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  Image,
-  ScrollView,
-  StyleSheet,
-} from "react-native";
-import { Button } from "react-native-paper";
+import { useState } from "react";
+
+import { View, Text, ActivityIndicator, Image, StyleSheet } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 
 import { Ionicons } from "@expo/vector-icons";
 
 import CalendarPicker from "react-native-calendar-picker";
 import moment from "moment";
-import { useState } from "react";
+import CustomModal from "../components/customModal";
+import RoomAmenities from "../components/amenities";
+import { Button, Chip } from "@rneui/themed";
 
 const ratingsArray = [1, 2, 3, 4, 5];
 
 const RoomDetails = ({ route, navigation }) => {
   console.log("*************************");
-  console.log(route.params.name);
-  console.log(route.params.price);
-  const description = route.params.data[0].details.desc;
-  console.log(route.params.data[0]);
+  // console.log(route.params.name);
+  // console.log(route.params.price);
+  console.log("here here ere here here here");
+  console.log(route.params);
+  const data = route.params.data;
+
+  // const description = route.params.data[0].details.desc;
+  // console.log(route.params.data[0]);
+
+  const [visible, setVisible] = useState(false);
 
   //
 
@@ -62,7 +65,7 @@ const RoomDetails = ({ route, navigation }) => {
 
   // console.log(description);
   console.log("*************************");
-  if (!description) {
+  if (!data) {
     return (
       <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
         <ActivityIndicator size="large" color="#00308F" />
@@ -75,22 +78,35 @@ const RoomDetails = ({ route, navigation }) => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollview}>
-    <View style={styles.main_container}>
-        <View>
-          <Image
-            source={require("../assets/images/hotel.jpg")}
-            style={{ width: "100%", height: 200 }}
-          />
-          <View style={styles.details}>
-              <Text style={styles.heading}>{route.params.name}</Text>
-              {<Text style={styles.heading}>{route.params.price}/Night</Text>}
-           
+    <>
+      <ScrollView contentContainerStyle={styles.scrollview}>
+        <View style={styles.main_container}>
+          <View>
+            <Image
+              source={require("../assets/images/hotel.jpg")}
+              style={{ width: "100%", height: 180 }}
+            />
+            <View style={styles.details}>
+              
+              <Button
+                title="View Room Features"
+                onPress={() => setVisible(true)}
+                type="solid"
+                color="#00308F"
+                containerStyle={{ borderRadius: 20 }}
+              />
+               <Button
+                title="View Room Images"
+                onPress={() => setVisible(true)}
+                type="solid"
+                color="#00308F"
+                containerStyle={{ borderRadius: 20 }}
+              />
+            </View>
           </View>
         </View>
-      </View>
 
-      {/* <ScrollView contentContainerStyle={styles.scrollview}> */}
+        {/* <ScrollView contentContainerStyle={styles.scrollview}> */}
         {/* <Text</Text> */}
 
         <View style={styles.container}>
@@ -124,34 +140,40 @@ const RoomDetails = ({ route, navigation }) => {
               <Text
                 style={[{ fontStyle: "italic", marginTop: 10 }, styles.text]}
               >
-                Note: You must check out before 11am local time on {endDate}
+                Note: You must check out before 11am EAT on {endDate}
               </Text>
             }
           </View>
         </View>
         <View style={styles.price_calc}>
-          <View style={styles.price_calc_child}>
+          <View style={styles.price_calc_sndchild}>
             <Text>Night(s) Booked: {days}</Text>
-            <Text>Price/Night: 15000</Text>
+            <Text>Price/Night: {data.price}</Text>
+            <Text>Total Cost: {days ? Number(days) * data.price : ""}</Text>
           </View>
-          <View style={styles.price_calc_child}>
-            <Text>Number Of Adults: 1</Text>
-            <Text>Total Cost: {Number(days) * 15000}</Text>
+          <View style={styles.price_calc_sndchild}>
+            <Text>Number Of Adults: {data.occupancy.adult}</Text>
+            <Text>Number Of Children: {data.occupancy.children}</Text>
+            <Text>Number Of Guests: {data.occupancy.guest}</Text>
           </View>
         </View>
 
-       
-      <View style={styles.custom_buttons}>
+        <View style={styles.custom_buttons}>
           <Button
-            mode="contained"
+            title="Search for Room Availability"
+            type="solid"
             color="#00308F"
-            // onPress={bookNow}
-            style={styles.custom_buttons_book}
-          >
-            Search for Room Availability
-          </Button>
+          />
         </View>
-    </ScrollView>
+      </ScrollView>
+
+      <CustomModal
+        visible={visible}
+        setVisible={setVisible}
+        RoomAmenities={RoomAmenities}
+        data={data}
+      />
+    </>
   );
 };
 
@@ -165,12 +187,12 @@ const styles = StyleSheet.create({
   main_container: {},
   details: {
     flex: 1,
-    flexDirection:"row",
-    padding: 10,
-    backgroundColor: "#00308F",
+    flexDirection: "row",
+    padding: 5,
+    // backgroundColor: "#FCFCFC",
     marginTop: -25,
-    opacity:0.9,
-    marginHorizontal: 10,
+    // opacity: 0,
+    marginHorizontal: 5,
     // borderRadius: 4,
     alignItems: "center",
     justifyContent: "space-around",
@@ -181,9 +203,9 @@ const styles = StyleSheet.create({
     // justifyContent:"center"
   },
   heading: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
-    marginBottom: 5,
+    // marginBottom: 5,
     color: "#ffffff",
     // textAlign:"center"
   },
@@ -244,10 +266,12 @@ const styles = StyleSheet.create({
     color: "#00308F",
   },
   price_calc: {
+    flexDirection:"row",
     backgroundColor: "whitesmoke",
     paddingVertical: 10,
     marginHorizontal: 5,
     borderRadius: 5,
+    justifyContent:"space-between"
   },
   price_calc_child: {
     flexDirection: "row",
@@ -256,12 +280,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     justifyContent: "space-between",
   },
+  price_calc_sndchild: {
+    flexDirection: "column",
+    flexWrap: "wrap",
+    marginVertical: 10,
+    paddingHorizontal: 10,
+    // justifyContent: "space-between",
+  },
   custom_buttons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
     marginHorizontal: 5,
     marginTop: 10,
-    alignItems: "flex-end",
+    justifyContent: "flex-end",
+    borderRadius: 10,
   },
   custom_buttons_book: {
     flexBasis: "100%",

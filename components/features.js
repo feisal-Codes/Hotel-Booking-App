@@ -92,7 +92,8 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
     flexDirection: "column",
-    padding: 2,
+    padding: 5,
+    marginVertical:10
     // justifyContent:"space-around"
   },
   main_container: {

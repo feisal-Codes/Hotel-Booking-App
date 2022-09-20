@@ -1,8 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import modeReducer from "./reducers/mode"
+import authReducer from "./reducers/authSlice";
+import hotelDataSlice from "./reducers/hotelDataSlice";
+import roomsDataSlice from "./reducers/roomsDataSlice";
 
 export const store = configureStore({
   reducer: {
-    mode:modeReducer
+    auth:authReducer,
+    rooms:roomsDataSlice,
+    hotel: hotelDataSlice
   },
 });

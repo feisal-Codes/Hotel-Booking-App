@@ -1,12 +1,15 @@
 import { View, Text, StyleSheet } from "react-native";
-import { TextInput } from 'react-native-paper';
+import { Input, Icon } from '@rneui/themed';
 import React from "react";
 
 const CustomInput = ({ inputConfig }) => {
   return (
     <View style={styles.inputContainer}>
       {/* <Text>{inputConfig.label}</Text> */}
-      <TextInput   style={styles.input} {...inputConfig} />
+     
+      <Input
+       style={styles.input} {...inputConfig}
+    />
     </View>
   );
 };

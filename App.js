@@ -1,17 +1,14 @@
-import "react-native-gesture-handler";
+// import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
-
-import { en, enGB, registerTranslation } from "react-native-paper-dates";
-
-// import { Provider } from "react-redux";
+import { useSelector, Provider, useDispatch } from "react-redux";
 
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 
-import { useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 
 import Contact from "./components/contact";
 import Home from "./components/home";
@@ -19,8 +16,9 @@ import RoomType from "./screens/roomTypes";
 import colors from "./util/colors";
 import Book from "./screens/book";
 import Settings from "./components/settings";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-// import { store } from "./store/store";
+import { store } from "./store/store";
 
 import RoomDetails from "./screens/roomDetails";
 import {
@@ -33,34 +31,32 @@ import {
   FlatList,
   Pressable,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import Login from "./screens/login";
 import Register from "./screens/register";
+import Location from "./screens/location";
+import { getRoomsData } from "./store/reducers/roomsDataSlice";
+import { getHotelsData } from "./store/reducers/hotelDataSlice";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
+const Tab = createBottomTabNavigator();
 
-registerTranslation("en", en);
-registerTranslation("en-GB", enGB);
 
-// if (Platform.OS === "android") {
-//   // See https://github.com/expo/expo/issues/6536 for this issue.
-//   if (typeof (Intl).__disableRegExpRestore === "function") {
-//       (Intl).__disableRegExpRestore();
-//   }
-// }
 
 function MyStackScreens() {
   return (
-    <Stack.Navigator> 
+    <Stack.Navigator>
       <Stack.Screen
         name="types"
         component={RoomType}
         options={{
-          title: "Type Rooms",
+          title: "Rooms",
           headerShown: false,
           contentStyle: {
-            backgroundColor: "#e6e9ed",
+            backgroundColor: "#00308F",
           },
         }}
       />
@@ -70,11 +66,18 @@ function MyStackScreens() {
         options={{
           headerTitleAlign: "center",
           headerStyle: {
-            backgroundColor: "#e6e9ed",
+            backgroundColor: "#00308F",
+             
           },
           contentStyle: {
             backgroundColor: "#e6e9ed",
           },
+
+          headerTintColor:"white",
+          // headerShown:false         
+          
+          
+
         }}
       />
       <Stack.Screen
@@ -84,13 +87,12 @@ function MyStackScreens() {
           headerTitleAlign: "center",
           headerStyle: {
             backgroundColor: "#e6e9ed",
-            
           },
           contentStyle: {
             backgroundColor: "#e6e9ed",
           },
-          headerTintColor:{
-            color:"white"
+          headerTintColor: {
+            color: "white",
           },
           // contentStyle: {
           //   backgroundColor: "#e6e9ed",
@@ -101,141 +103,278 @@ function MyStackScreens() {
   );
 }
 
+function MainScreen() {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+
+        
+        tabBarActiveTintColor: "gold",
+        tabBarInactiveTintColor: "#f5f6f7",
+        tabBarStyle:{
+          backgroundColor:"#00308F"
+        }
+      })}
+      
+    
+    >
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ focused, size, color }) => (
+            <Ionicons name="md-home" size={20} color={color} />
+          ),
+        }}
+        
+      />
+      <Tab.Screen
+        name="Roomtypes"
+        component={MyStackScreens}
+        options={({ route }) => ({
+          title: "Rooms",
+          tabBarIcon: ({ focused, size, color }) => (
+            <Ionicons name="bed-outline" size={20} color={color} />
+          ),
+          headerShown:
+            getFocusedRouteNameFromRoute(route) == "details" ||
+            getFocusedRouteNameFromRoute(route) == "book"
+              ? false
+              : false,
+        })}
+      />
+      <Tab.Screen
+        name="Bookings"
+        component={Book}
+        options={{
+          backgroundColor: "#e6e9ed",
+          tabBarIcon: ({ focused, size, color }) => (
+            <Ionicons name="ios-list" size={20} color={color} />
+          ),
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={Contact}
+        options={{
+          backgroundColor: "#e6e9ed",
+          tabBarIcon: ({ focused, size, color }) => (
+            <Ionicons
+              name="md-person-circle-outline"
+              size={20}
+              color={color}
+            />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+    // <Drawer.Navigator
+    //   screenOptions={{
+    //     headerStyle: {
+    //       backgroundColor: "#e6e9ed",
+    //     },
+    //     sceneContainerStyle: {
+    //       backgroundColor: "#e6e9ed",
+    //     },
+    //     drawerContentStyle: {
+    //       backgroundColor: "#ffffff",
+    //       paddingTop: 15,
+    //     },
+    //   }}
+    // >
+    //   <Drawer.Screen
+    //     name="Home"
+    //     component={Home}
+    //     options={{
+    //       contentStyle: {
+    //         // backgroundColor: "red",
+    //       },
+    //       drawerIcon: ({ focused, size }) => (
+    //         <Ionicons
+    //           name="md-home"
+    //           size={size}
+    //           color={focused ? "blue" : "#ccc"}
+    //         />
+    //       ),
+    //     }}
+    //   />
+    //   <Drawer.Screen
+    //     name="Roomtypes"
+    //     component={MyStackScreens}
+    //     options={({ route }) => ({
+    //       title: "Type Of Rooms",
+    //       drawerIcon: ({ focused, size, color }) => (
+    //         <Ionicons name="bed-outline" size={size} color={color} />
+    //       ),
+    //       headerShown:
+    //         getFocusedRouteNameFromRoute(route) == "details" ||
+    //         getFocusedRouteNameFromRoute(route) == "book"
+    //           ? false
+    //           : true,
+    //     })}
+    //   />
+    //   <Drawer.Screen
+    //     name="Bookings"
+    //     component={Book}
+    //     options={{
+    //       backgroundColor: "#e6e9ed",
+    //       drawerIcon: ({ focused, size, color }) => (
+    //         <Ionicons name="receipt-outline" size={size} color={color} />
+    //       ),
+    //       headerShown: false,
+    //     }}
+    //   />
+    //   <Drawer.Screen
+    //     name="Location"
+    //     component={Location}
+    //     options={{
+    //       backgroundColor: "#e6e9ed",
+    //       drawerIcon: ({ focused, size, color }) => (
+    //         <Ionicons name="location-outline" size={size} color={color} />
+    //       ),
+    //     }}
+    //   />
+    //   <Drawer.Screen
+    //     name="Settings"
+    //     component={Contact}
+    //     options={{
+    //       backgroundColor: "#e6e9ed",
+    //       drawerIcon: ({ focused, size, color }) => (
+    //         <Ionicons name="md-settings-outline" size={size} color={color} />
+    //       ),
+    //     }}
+    //   />
+    //   <Drawer.Screen
+    //     name="Profile"
+    //     component={Contact}
+    //     options={{
+    //       backgroundColor: "#e6e9ed",
+    //       drawerIcon: ({ focused, size, color }) => (
+    //         <Ionicons
+    //           name="md-person-circle-outline"
+    //           size={size}
+    //           color={color}
+    //         />
+    //       ),
+    //     }}
+    //   />
+    // </Drawer.Navigator>
+  );
+}
+
+function AuthScreen() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="login"
+        component={Login}
+        options={{
+          title: "login",
+          headerShown: false,
+          contentStyle: {
+            backgroundColor: "whitesmoke",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="register"
+        component={Register}
+        options={{
+          title: "register",
+          headerShown: false,
+          contentStyle: {
+            backgroundColor: "whitesmoke",
+          },
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+function AppEntry() {
+  const dispatch = useDispatch();
+  const isAuth = useSelector(state => state.auth.isAuth);
+  const hdata = useSelector(state => state.hotel.data);
+  const hloading = useSelector(state => state.hotel.loading);
+  const hisSuccess = useSelector(state => state.hotel.isSuccess);
+  const message = useSelector(state => state.hotel.message);
+  const { data, loading, isSuccess } = useSelector(state => state.rooms);
+  // console.log("this is the needed state");
+  // console.log(loading);
+  // console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+
+  // console.log(isAuth);
+  // console.log("&&&&&&&&&&&&&&&");
+  console.log("rdata");
+  console.log(data);
+  useEffect(() => {
+    dispatch(getRoomsData());
+    dispatch(getHotelsData());
+  }, []);
+
+  // const mydata = useSelector(state => state.rooms.data);
+  // console.log(mydata);
+
+  console.log(
+    "***********************This is the data we need **********************"
+  );
+  // console.log(data);
+  console.log("loading : " + loading);
+  console.log("success " + isSuccess);
+  if (hloading || loading) {
+    return (
+      <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+  console.log("data ", data);
+  console.log("message" + message);
+  console.log(
+    "***********************This is the data we need **********************"
+  );
+
+  if (
+    (loading == false && isSuccess == false) ||
+    (hloading == false && hisSuccess == false)
+  ) {
+    return (
+      <View>
+        <Text>
+          oops something went wrong, check your network connection and try
+          again.......
+        </Text>
+      </View>
+    );
+  }
+
+  if (!hdata || !data) {
+    return (
+      <View>
+        <Text>oops something went wrong, try again.......</Text>
+      </View>
+    );
+  }
+
+  return (
+    <NavigationContainer>
+      {!isAuth && <AuthScreen />}
+      {isAuth && <MainScreen />}
+    </NavigationContainer>
+  );
+}
+
 export default function App() {
   return (
     <>
-      <StatusBar style="dark" />
-      <NavigationContainer>
-        <Drawer.Navigator
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: "#e6e9ed",
-            },
-            sceneContainerStyle: {
-              backgroundColor: "#e6e9ed",
-            },
-            drawerContentStyle: {
-              backgroundColor: "#ffffff",
-              paddingTop: 15,
-            },
-          }}
-        >
-          <Drawer.Screen
-            name="Home"
-            component={Home}
-            options={{
-              contentStyle: {
-                // backgroundColor: "red",
-              },
-              drawerIcon: ({ focused, size }) => (
-                <Ionicons
-                  name="md-home"
-                  size={size}
-                  color={focused ? "blue" : "#ccc"}
-                />
-              ),
-            }}
-          />
-          <Drawer.Screen
-            name="login"
-            component={Login}
-            options={{
-              contentStyle: {
-                backgroundColor: "red",
-              },
-              drawerIcon: ({ focused, size }) => (
-                <Ionicons
-                  name="md-home"
-                  size={size}
-                  color={focused ? "blue" : "#ccc"}
-                />
-              ),
-              headerShown: false,
-            }}
-          />
-          <Drawer.Screen
-            name="register"
-            component={Register}
-            options={{
-              contentStyle: {
-                backgroundColor: "red",
-              },
-              drawerIcon: ({ focused, size }) => (
-                <Ionicons
-                  name="md-home"
-                  size={size}
-                  color={focused ? "blue" : "#ccc"}
-                />
-              ),
-              headerShown: false,
-            }}
-          />
-          <Drawer.Screen
-            name="Roomtypes"
-            component={MyStackScreens}
-            options={({ route }) => ({
-              title: "Type Of Rooms",
-              drawerIcon: ({ focused, size, color }) => (
-                <Ionicons name="bed-outline" size={size} color={color} />
-              ),
-              headerShown:
-                getFocusedRouteNameFromRoute(route) == "details" ||
-                getFocusedRouteNameFromRoute(route) == "book"
-                  ? false
-                  : true,
-            })}
-          />
-          <Drawer.Screen
-              name="Bookings"
-              component={Book}
-              options={{
-                backgroundColor: "#e6e9ed",
-                drawerIcon: ({ focused, size, color }) => (
-                  <Ionicons name="receipt-outline" size={size} color={color} />
-                ),
-                headerShown:false
-              }}
-            />
-          <Drawer.Screen
-            name="Location"
-            component={Contact}
-            options={{
-              backgroundColor: "#e6e9ed",
-              drawerIcon: ({ focused, size, color }) => (
-                <Ionicons name="location-outline" size={size} color={color} />
-              ),
-            }}
-          />
-          <Drawer.Screen
-            name="Settings"
-            component={Contact}
-            options={{
-              backgroundColor: "#e6e9ed",
-              drawerIcon: ({ focused, size, color }) => (
-                <Ionicons
-                  name="md-settings-outline"
-                  size={size}
-                  color={color}
-                />
-              ),
-            }}
-          />
-          <Drawer.Screen
-            name="Profile"
-            component={Contact}
-            options={{
-              backgroundColor: "#e6e9ed",
-              drawerIcon: ({ focused, size, color }) => (
-                <Ionicons
-                  name="md-person-circle-outline"
-                  size={size}
-                  color={color}
-                />
-              ),
-            }}
-          />
-        </Drawer.Navigator>
-      </NavigationContainer>
+      <StatusBar backgroundColor="transparent" style="auto" />
+
+      <Provider store={store}>
+        <AppEntry />
+      </Provider>
     </>
   );
 }
