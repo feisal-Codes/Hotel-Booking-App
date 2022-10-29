@@ -13,10 +13,11 @@ import React, { useEffect, useLayoutEffect, useState } from "react";
 import Contact from "./components/contact";
 import Home from "./components/home";
 import RoomType from "./screens/roomTypes";
-import colors from "./util/colors";
+import { colors } from "./util/colors";
 import Book from "./screens/book";
 import Settings from "./components/settings";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import RoomAmenities, { MyTabs } from "./components/amenities";
 
 import { store } from "./store/store";
 
@@ -39,61 +40,126 @@ import Location from "./screens/location";
 import { getRoomsData } from "./store/reducers/roomsDataSlice";
 import { getHotelsData } from "./store/reducers/hotelDataSlice";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Bookings from "./screens/bookings";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
 
 
+function DetailsStack(){
+  return (
+    <Stack.Navigator>
+
+
+
+      <Stack.Screen
+        name="Location"
+        component={Location}
+        options={{
+          title: "location",
+          headerTitleAlign: "center",
+          headerStyle: {
+            backgroundColor: colors.primary400,
+          },
+          headerTintColor: colors.textColor,
+          contentStyle: {
+            backgroundColor: "#e6e9ed",
+          },
+
+          // headerShown:false
+          // contentStyle: {
+          //   backgroundColor: "#e6e9ed",
+          // },
+        }}
+      />
+      </Stack.Navigator>
+  )
+}
+
+
 
 function MyStackScreens() {
   return (
     <Stack.Navigator>
+
+
+
+    
+    
+
       <Stack.Screen
         name="types"
         component={RoomType}
         options={{
+          headerTitleAlign: "center",
           title: "Rooms",
-          headerShown: false,
+          // headerShown: false,
           contentStyle: {
-            backgroundColor: "#00308F",
+            // backgroundColor: "#00308F",
+            // backgroundColor: "#e6e9ed",
           },
+          headerStyle: {
+            backgroundColor: colors.primary400,
+          },
+          headerTintColor: colors.textColor,
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="details"
         component={RoomDetails}
         options={{
           headerTitleAlign: "center",
           headerStyle: {
-            backgroundColor: "#00308F",
-             
+            backgroundColor: colors.primary400,
           },
+          headerTintColor: colors.textColor,
           contentStyle: {
-            backgroundColor: "#e6e9ed",
+            // backgroundColor: "#e6e9ed",
           },
 
-          headerTintColor:"white",
-          // headerShown:false         
-          
-          
-
+          // headerTintColor: "white",
+          // headerShown:false
         }}
-      />
+      /> */}
+
+    
       <Stack.Screen
         name="book"
         component={Book}
         options={{
           headerTitleAlign: "center",
           headerStyle: {
-            backgroundColor: "#e6e9ed",
+            backgroundColor: colors.primary400,
           },
+          headerTintColor: colors.textColor,
           contentStyle: {
-            backgroundColor: "#e6e9ed",
+            // backgroundColor: "#e6e9ed",
           },
-          headerTintColor: {
-            color: "white",
+          // headerTintColor: {
+          //   color: "white",
+          // },
+          // contentStyle: {
+          //   backgroundColor: "#e6e9ed",
+          // },
+        }}
+      />
+       
+      <Stack.Screen
+        name="amenities"
+        component={MyTabs}
+        options={{
+          title: "Room Features",
+          headerTitleAlign: "center",
+          headerStyle: {
+            backgroundColor: colors.primary400,
           },
+          headerTintColor: colors.textColor,
+          // contentStyle: {
+          //   backgroundColor: "red",
+          // },
+
+          // headerShown:false
           // contentStyle: {
           //   backgroundColor: "#e6e9ed",
           // },
@@ -107,28 +173,25 @@ function MainScreen() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-
-        
         tabBarActiveTintColor: "gold",
         tabBarInactiveTintColor: "#f5f6f7",
-        tabBarStyle:{
-          backgroundColor:"#00308F"
-        }
+        tabBarStyle: {
+          backgroundColor: colors.primary400,
+        },
       })}
-      
-    
     >
       <Tab.Screen
         name="Home"
-        component={Home}
+        component={Home} 
         options={{
           headerShown: false,
           tabBarIcon: ({ focused, size, color }) => (
             <Ionicons name="md-home" size={20} color={color} />
           ),
         }}
-        
       />
+      
+     
       <Tab.Screen
         name="Roomtypes"
         component={MyStackScreens}
@@ -144,16 +207,32 @@ function MainScreen() {
               : false,
         })}
       />
+
+      
       <Tab.Screen
         name="Bookings"
-        component={Book}
+        component={Bookings}
         options={{
           backgroundColor: "#e6e9ed",
           tabBarIcon: ({ focused, size, color }) => (
             <Ionicons name="ios-list" size={20} color={color} />
           ),
           headerShown: false,
+          
         }}
+      />
+
+<Tab.Screen
+      
+      name="Location"
+      component={Location}
+      options={{
+        headerShown: false,
+        tabBarIcon: ({ focused, size, color }) => (
+          <Ionicons name="location" size={20} color={color} />
+        ),
+      }}
+      
       />
       <Tab.Screen
         name="Profile"
@@ -161,11 +240,7 @@ function MainScreen() {
         options={{
           backgroundColor: "#e6e9ed",
           tabBarIcon: ({ focused, size, color }) => (
-            <Ionicons
-              name="md-person-circle-outline"
-              size={20}
-              color={color}
-            />
+            <Ionicons name="md-person-circle-outline" size={20} color={color} />
           ),
         }}
       />
@@ -300,7 +375,7 @@ function AppEntry() {
   const hloading = useSelector(state => state.hotel.loading);
   const hisSuccess = useSelector(state => state.hotel.isSuccess);
   const message = useSelector(state => state.hotel.message);
-  const { data, loading, isSuccess } = useSelector(state => state.rooms);
+  const { data, loading, isSuccess } = useSelector(state => state.rooms); 
   // console.log("this is the needed state");
   // console.log(loading);
   // console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
@@ -330,19 +405,18 @@ function AppEntry() {
       </View>
     );
   }
-
-  console.log("data ", data);
-  console.log("message" + message);
-  console.log(
-    "***********************This is the data we need **********************"
-  );
+  // console.log("data ", data);
+  // console.log("message" + message);
+  // console.log(
+  //   "***********************This is the data we need **********************"
+  // );
 
   if (
     (loading == false && isSuccess == false) ||
     (hloading == false && hisSuccess == false)
   ) {
     return (
-      <View>
+      <View style={{marginTop:50}}>
         <Text>
           oops something went wrong, check your network connection and try
           again.......
@@ -350,10 +424,11 @@ function AppEntry() {
       </View>
     );
   }
-
+console.log(hdata)
+console.log(data)
   if (!hdata || !data) {
     return (
-      <View>
+      <View style={{marginTop:50}}>
         <Text>oops something went wrong, try again.......</Text>
       </View>
     );
@@ -361,6 +436,12 @@ function AppEntry() {
 
   return (
     <NavigationContainer>
+      <StatusBar
+        backgroundColor={colors.primary400}
+        style="light"
+        barStyle="light-content"
+      />
+
       {!isAuth && <AuthScreen />}
       {isAuth && <MainScreen />}
     </NavigationContainer>
@@ -370,7 +451,11 @@ function AppEntry() {
 export default function App() {
   return (
     <>
-      <StatusBar backgroundColor="transparent" style="auto" />
+       <StatusBar
+        backgroundColor={colors.primary400}
+        style="light"
+        barStyle="light-content"
+      />
 
       <Provider store={store}>
         <AppEntry />
@@ -382,6 +467,6 @@ export default function App() {
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    backgroundColor: "#e6e9ed",
+    // backgroundColor: "#e6e9ed",
   },
 });

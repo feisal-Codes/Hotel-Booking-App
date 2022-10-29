@@ -1,111 +1,155 @@
+import { View, Text, StyleSheet, ActivityIndicator, Alert } from "react-native";
 import React, { useState } from "react";
-import { StyleSheet, Text, View, Dimensions,ScrollView } from "react-native";
-import CalendarPicker from "react-native-calendar-picker";
-import moment from "moment";
-// import { LinearGradient } from "expo-linear-gradient";
+import { Button, Chip } from "@rneui/themed";
+import { colors } from "../util/colors";
+import { ScrollView } from "react-native-gesture-handler";
+import { AddBook } from "../util/http";
+import { useSelector } from "react-redux";
 
-const windowWidth = Dimensions.get("window").width;
-const windowHeight = Number(Dimensions.get("window").height);
+const Book = ({ navigation, route }) => {
+  console.log(route.params);
+  const data = route.params.bookingData;
+  const days = route.params.days;
+  const dates = route.params.bookingDates;
+  const userId = route.params.userId;
+  const state = useSelector(state => {
+    return state.auth;
+  });
 
-const Book = ({navigation, route}) => {
-  const [selectedStartDate, setSelectedStartDate] = useState(null);
-  const [selectedEndDate, setSelectedEndDate] = useState(null);
-  const [duration, setDuration] = useState(null);
- 
+  const [isLoading, setisLoading] = useState(false);
 
-const params= route.params
-console.log(params)
+  console.log(dates);
 
-  function onDateChange(date, type) {
-    if (type === "END_DATE") {
-      setSelectedEndDate(date);
-    } else {
-      setSelectedStartDate(date);
-      setSelectedEndDate(null);
-    }
-    console.log("this is the ", type);
-    console.log("this is the date", date);
+  if (!data) {
+    return (
+      <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
   }
 
-  function getDateDifference() {
-    if (selectedEndDate !== null && selectedStartDate !== null) {
-      let days = selectedEndDate.diff(selectedStartDate, "days");
-      return days;
+  const handleBooking = async () => {
+    // roomType,
+    // startDate,
+    // endDate,
+    // userId,
+    // roomId,
+    // roomNumber,
+    // totalAmount,
+    // totalNights,
+    // status,
+    try {
+      const { startDate, endDate } = dates;
+      const { _id, number, type } = data;
+      const totalAmount = Number(data.price * Number(days));
+      const config = {
+        headers: {
+          Authorization: `Bearer ${state.user ? state.user.token : ""}`,
+        },
+      };
+      const book = {
+        roomType: type,
+        startDate,
+        endDate,
+        userId,
+        roomm:data,
+        RoomId: _id,
+        roomNumber: number,
+        totalAmount,
+        totalNights: days,
+        status: "Not paid ",
+      }; 
+
+      const res = await AddBook(book, config);
+      console.log(res)
+      
+      if (res == 401 || res == 500 || res == 404) {
+        throw res;
+      }
+
+      if (typeof res == "undefined") {
+        throw res;
+      }
+      
+      if (res.status == 200) {
+        Alert.alert("success", "Room was reserved,please pay on arrival");
+      }
+    } catch (err) {
+      console.log(err);
     }
-    return undefined;
-  }
-
-  let days = getDateDifference();
-  const startDate = selectedStartDate
-    ? moment.utc(selectedStartDate).format("D MMMM, YYYY").toString()
-    : "select date to check out on the calendar";
-  const endDate = selectedEndDate
-    ? moment.utc(selectedEndDate).format("D MMMM, YYYY").toString()
-    : "select date to check out on the calendar";
-  const minDate = new Date(); // Today
-  const maxDate = moment().add(5, "months");
-
-
+  };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollview}>
-      {/* <Text</Text> */}
-
-      <View style={styles.container}>
-        <CalendarPicker
-          startFromMonday={true}
-          allowRangeSelection={true}
-          minDate={minDate}
-          maxDate={maxDate}
-          todayBackgroundColor="whitesmoke"
-          todayTextStyle={{ color: "black" }}
-          selectedDayColor="#00308F"
-          selectedDayTextColor="#FFFFFF"
-          onDateChange={onDateChange}
-          restrictMonthNavigation={true}
-          scrollable={true}
-          horizontal={false}
-          // showDayStragglers={true}
-          nextTitle="Next Month"
-          previousTitle="Previous Month"
-          textStyle={{ color: "black", fontSize: 16 }}
+    <ScrollView>
+      <View>
+        <Button
+          title="Booking Details"
+          // onPress={handlePress}
+          type="solid"
+          color={colors.textColorGold}
+          size="sm"
+          raised={true}
+          titleStyle={{ color: "black" }}
+          containerStyle={{ marginBottom: 10 }}
         />
 
-        <View style={styles.dates_container}>
-          <Text style={styles.text}>
-            Check In: <Text style={styles.text_placeholder}>{startDate}</Text>
+        <View style={styles.price_calc_sndchild}>
+          <Text style={styles.textFont}>
+            {`${
+              dates.roomType.charAt(0).toUpperCase() + dates.roomType.slice(1)
+            } `}
+            Room
           </Text>
-          <Text style={styles.text}>
-            Check Out: <Text style={styles.text_placeholder}>{endDate}</Text>
-          </Text>
-          {
-            <Text style={[{ fontStyle: "italic", marginTop: 10 }, styles.text]}>
-              Note: You must check out before 11am local time on {endDate}
-            </Text>
-          }
-        </View>
-      </View>
-      <View style={styles.price_calc}>
-        <View style={styles.price_calc_child}>
-          <Text>Night(s) Booked: {days}</Text>
-          <Text>Price/Night: 15000</Text>
-        </View>
-        <View style={styles.price_calc_child}>
-          <Text>Number Of Adults: 1</Text>
-          <Text>Total Cost: {Number(days) * 15000}</Text>
-        </View>
-      </View>
+          <Text style={styles.textFont}>Room Number: {data.number}</Text>
 
-      <View style={styles.custom_buttons}>
-        {/* <Button
-          mode="contained"
-          color="#00308F"
-          // onPress={bookNow}
-          style={styles.custom_buttons_book}
-        >
-          Search for Room Availability
-        </Button> */}
-       
+          <Text style={styles.textFont}>Check in : {dates.startDate}</Text>
+          <Text style={styles.textFont}>Check out : {dates.endDate}</Text>
+        </View>
+
+        <View style={styles.price_calc_sndchild}>
+          <Text style={styles.textFont}>Night(s) Booked: {days}</Text>
+          <Text style={styles.textFont}>Price/Night: {data.price}</Text>
+          <Text style={styles.textFont}>
+            Total Cost: {days ? Number(days) * data.price : ""}
+          </Text>
+        </View>
+        <View style={styles.price_calc_sndchild}>
+          <Text style={styles.textFont}>
+            Number Of Adults: {data.occupancy.adult}
+          </Text>
+          <Text style={styles.textFont}>
+            Number Of Children: {data.occupancy.children}
+          </Text>
+          <Text style={styles.textFont}>
+            Number Of Guests: {data.occupancy.guest}
+          </Text>
+        </View>
+
+        <View>
+          <Text style={[{ fontStyle: "italic", marginTop: 10 }, styles.text]}>
+            Note: You must check out before 11am EAT on {dates.endDate}
+          </Text>
+        </View>
+        <View style={styles.custom_buttons}>
+          <Button
+            title="Pay Now"
+            type="solid"
+            color={colors.primary400}
+            size="md"
+            // onPress={() => handleBooking(data.type)}
+            // loading={isLoading}
+            buttonStyle={{ margin: 10, marginBottom: 0 }}
+          />
+          <Button
+            title="Pay On Arrival"
+            type="solid"
+            color={colors.primary400}
+            size="md"
+            onPress={handleBooking}
+            // loading={isLoading}
+            buttonStyle={{ margin: 10 }}
+          />
+        </View>
       </View>
     </ScrollView>
   );
@@ -114,62 +158,25 @@ console.log(params)
 export default Book;
 
 const styles = StyleSheet.create({
-  scrollview: {
-    flexGrow: 1,
-    justifyContent: "space-between",
-    flexDirection: "column",
-    paddingBottom: 10,
-  },
-  main_container: {
-    flex: 1,
-  },
-
-  container: {
-    flex: 1,
-
-    paddingTop: 10,
-    backgroundColor: "whitesmoke",
-    marginHorizontal: 5,
-
-    borderRadius: 10,
-    marginTop: 5,
-    marginBottom: 10,
-    justifyContent: "flex-start",
-  },
-  dates_container: {
-    padding: 10,
-    flex: 1,
-  },
   text: {
-    marginBottom: 10,
+    marginHorizontal: 10,
   },
   text_placeholder: {
     fontStyle: "italic",
 
     color: "#00308F",
   },
-  price_calc: {
-    backgroundColor: "whitesmoke",
-    paddingVertical: 10,
-    marginHorizontal: 5,
-    borderRadius: 5,
+  textFont: {
+    fontSize: 15,
+    marginBottom: 1,
   },
-  price_calc_child: {
-    flexDirection: "row",
+  price_calc_sndchild: {
+    flexDirection: "column",
     flexWrap: "wrap",
     marginVertical: 10,
-    paddingHorizontal: 10,
-    justifyContent: "space-between",
-  },
-  custom_buttons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginHorizontal: 5,
-    marginTop: 10,
-    alignItems: "flex-end",
-  },
-  custom_buttons_book: {
-    flexBasis: "100%",
-    justifyContent: "flex-end",
+    // paddingHorizontal: 10,
+    backgroundColor: "white",
+    padding: 20,
+    // justifyContent: "space-between",
   },
 });

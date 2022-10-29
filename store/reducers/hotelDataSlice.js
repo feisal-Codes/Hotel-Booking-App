@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { url } from "../../util/urls";
 
-let hotelUrl = "http://192.168.100.10:3001/admin/get_hotel";
+let hotelUrl = url+"admin/get_hotel";
 
 export const getHotelsData = createAsyncThunk(
   "hotel/getHotelsData",

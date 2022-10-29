@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { getRoomType } from "../../util/http";
+import { url } from "../../util/urls";
 
-let roomUrl = "http://192.168.100.10:3001/roomType";
+let roomUrl = url + "room_type";
 
 export const getRoomsData = createAsyncThunk(
   "rooms/getRoomsData",
@@ -10,7 +11,8 @@ export const getRoomsData = createAsyncThunk(
     try {
       const response = await axios.get(roomUrl);
       console.log("we are in async thunk with the needed data");
-      // console.log(response.data);
+
+      console.log(response.data);
       return response.data;
     } catch (err) {
       rejectWithValue(err.response.data);
@@ -45,7 +47,7 @@ const RoomDataSlice = createSlice({
       (state.loading = false), (state.data = payload), (state.isSuccess = true);
     },
     [getRoomsData.rejected]: (state, { payload }) => {
-        (state.loading = false),
+      (state.loading = false),
         (state.isSuccess = false),
         (state.message = payload);
     },

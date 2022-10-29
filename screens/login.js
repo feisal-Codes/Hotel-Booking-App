@@ -112,10 +112,15 @@ function Login({ navigation }) {
       const response = await postLogin(inputValues);
       //console.log(response);
       console.log("this is the response");
-      if(!response || response == undefined){
-        throw response
+      if (!response || response == undefined) {
+        throw response;
       }
-      if (response.status == 401 || response.status == 404) {
+      if (
+        response.status == 401 ||
+        response.status == 404 ||
+        response.status == 503 ||
+        response.status == 500
+      ) {
         setIsLoading(false);
         throw response;
       }
@@ -131,17 +136,18 @@ function Login({ navigation }) {
     } catch (err) {
       console.log("this is the error response");
       // console.log(err);
-
+      setIsLoading(false);
       console.log(err);
       setErrors({
         email: "",
         password: "",
       });
-      console.log(err)
-      if(typeof err.message !== "undefined"){
-        console.log("%%%%%%%%%%%%%%%%%%")
-        console.log(err)
+      console.log(err);
+      if (typeof err.message !== "undefined") {
+        console.log("%%%%%%%%%%%%%%%%%%");
+        console.log(err);
         setErrorMessage(err.message);
+        setIsLoading(false);
       }
     }
 

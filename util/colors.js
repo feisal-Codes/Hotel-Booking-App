@@ -1,6 +1,9 @@
 export const colors={
-    primary400:"#78AAFF",
-    primary500:"#649EFF",
-    primary600:"#4188FF",
+    primary400:"#2089dc",
+    
+
+    textColor:"#FFFFFF",
+    textColorGold:"gold",
+    primary500:"#f5f6f7",
     
 }

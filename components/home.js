@@ -16,6 +16,7 @@ import { StatusBar } from "expo-status-bar";
 import { useDispatch, useSelector } from "react-redux";
 import { getHotelsData } from "../store/reducers/hotelDataSlice";
 import { image_base_url } from "../util/urls";
+import { colors } from "../util/colors";
 
 function Home({ navigation }) {
   const data = useSelector(state => state.hotel.data);
@@ -33,30 +34,41 @@ function Home({ navigation }) {
   }
 
   return (
-    
+      <>
+     <StatusBar
+        backgroundColor={colors.primary400}
+        style="light"
+        barStyle="light-content"
+      />
       <SafeAreaView style={styles.main}>
       
         <ScrollView style={styles.main}>
           <View>
             <Image
-              // source={require("../assets/images/hotel.jpg")}              source={require("../assets/images/hotel.jpg")}
-              source={image}
-              style={[styles.image, {height: 0.4 * height}]}
+            resizeMode="cover"
+              source={require("../assets/images/hotel3.jpeg")}             
+              //  source={require("../assets/images/hotel.jpg")}
+              // source={image}
+              style={[styles.image, {height: 0.32* height}]}
             />
           </View>
           <View style={styles.main_address}>
-            <Text style={styles.text}>{data.name}</Text>
+            {/* <Text style={styles.text}>{data.name}</Text> */}
+            <Text style={styles.text}>New Hotel</Text>
+
             <View>
               <View style={styles.secondary_text}>
-                <Ionicons name="location" size={18} color="green" />
+                <Ionicons name="location" size={18} color="gold" />
                 <Text style={styles.text_space}>{data.location}</Text>
               </View>
               <View style={styles.secondary_text}>
-                <Ionicons name="mail-outline" size={18} color="green" />
-                <Text style={styles.text_space}>{data.socials.email}</Text>
+                <Ionicons name="mail-outline" size={18} color="gold" />
+                {/* <Text style={styles.text_space}>{data.socials.email}</Text> */}
+                <Text style={styles.text_space}>feisalmib@gmail.com</Text>
+
               </View>
               <View style={styles.secondary_text}>
-                <FontAwesome name="phone" size={18} color="green" />
+                <FontAwesome name="phone" size={18} color="gold" />
                 <Text style={styles.text_space}>{data.contact}</Text>
               </View>
             </View>
@@ -89,9 +101,11 @@ function Home({ navigation }) {
           </View>
         </ScrollView>
       </SafeAreaView>
+      </>
     
   );
 }
+
 
 export default Home;
 
@@ -101,10 +115,10 @@ const styles = StyleSheet.create({
     paddingTop: 0,
     paddingHorizontal: 0,
     flex: 1,
-    backgroundColor:"#00308F"
+    // backgroundColor:colors.primary500
   },
   main_address: {
-    backgroundColor: "#f5f6f7",
+    backgroundColor: colors.primary400,
     padding: 20,
     marginHorizontal: 10,
     marginTop: -20,
@@ -113,11 +127,13 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 22,
     padding: 5,
+    color:"#ffffff"
   },
   secondary_text: {
     fontSize: 16,
     padding: 5,
     flexDirection: "row",
+    
   },
   icons: {
     flexDirection: "row",
@@ -128,9 +144,13 @@ const styles = StyleSheet.create({
   },
   text_space: {
     marginLeft: 10,
+    color:"#ffffff"
+
   },
   image:{
     width:"100%",
-    flex:1
+    flex:1,
+    marginTop:10
+    
   }
 });

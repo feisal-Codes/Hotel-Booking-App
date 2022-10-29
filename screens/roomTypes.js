@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import RoomAmenities from "../components/amenities";
 import { Button, Chip } from "@rneui/themed";
 
 import {
@@ -20,6 +19,7 @@ import { getRoomsData } from "../util/http";
 import { useDispatch, useSelector } from "react-redux";
 import { updateRoomData } from "../store/reducers/roomsDataSlice";
 import { image_base_url } from "../util/urls";
+import { colors } from "../util/colors";
 
 const RoomType = () => {
   const dispatch = useDispatch();
@@ -35,9 +35,11 @@ const RoomType = () => {
   console.log(state);
   const { data, loading, isSuccess } = state;
 
-  const images= useSelector(state=>{ return state.hotel.data.images})
-  console.log(images)
-  console.log("*****************************************")
+  const images = useSelector(state => {
+    return state.hotel.data.images;
+  });
+  console.log(images);
+  console.log("*****************************************");
   // console.log("data needed is here");
   // console.log(data);
 
@@ -86,10 +88,14 @@ const RoomType = () => {
     // console.log(roomname, roomdata);
 
     console.log("^^^^^^^^^^^^^^^^^^^^^^");
-    Navigate.navigate("details", {
+    //   Navigate.navigate("details", {
+    //     data: roomdata,
+    //     name: roomname,
+    //     price: roomdata.price,
+    //   });
+    //
+    Navigate.navigate("amenities", {
       data: roomdata,
-      name: roomname,
-      price: roomdata.price,
     });
   };
 
@@ -108,7 +114,7 @@ const RoomType = () => {
   //  }
 
   return (
-    <SafeAreaView style={{ flex: 1, marginTop: 30 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.main}>
         <ScrollView style={{ height: "100%" }}>
           {data
@@ -128,7 +134,8 @@ const RoomType = () => {
                 >
                   <ImageBackground
                     style={styles.parent}
-                    source={{ uri: image_base_url + images[roomType.type][1] }}
+                    // source={{ uri: image_base_url + images["standard"][0] }}
+                    source={require("../assets/images/hotel5.jpeg")}
                     resizeMode="cover"
                   >
                     <View style={styles.container}>
@@ -138,24 +145,31 @@ const RoomType = () => {
                     </Text> */}
                       <Chip
                         icon={{
-                          name: "home",
+                          name: "bed",
                           type: "font-awesome",
                           size: 20,
                           color: "white",
                         }}
-                        title={`${
-                          roomType.type.charAt(0).toUpperCase() +
-                          roomType.type.slice(1)
-                        }`}
+                        title={
+                          roomType.type == "family" 
+                            ? `${
+                                roomType.type.charAt(0).toUpperCase() +
+                                roomType.type.slice(1)
+                              } Suites`
+                            : `${
+                                roomType.type.charAt(0).toUpperCase() +
+                                roomType.type.slice(1)
+                              }`
+                        }
                         type="solid"
                         color="#00308F"
                         containerStyle={{}}
                       />
                       <Chip
                         icon={{
-                          name: "money",
+                          name: "dollar",
                           type: "font-awesome",
-                          size: 20,
+                          size: 15,
                           color: "white",
                         }}
                         title={`${roomType.price}`}
@@ -164,6 +178,18 @@ const RoomType = () => {
                         containerStyle={{}}
                       />
                     </View>
+
+                    {/* <Text
+                      style={{
+                        backgroundColor: "#00308F",
+                        color: "white",
+                        padding: 8,
+                        width: 150,
+                        textAlign: "center",
+                      }}
+                    >
+                      Click to Book Room
+                    </Text> */}
                   </ImageBackground>
                 </Pressable>
               );

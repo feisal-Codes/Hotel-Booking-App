@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { url, Loginurl, registerUrl, roomUrl, bookRoomUrl } from "./urls";
+import { url, Loginurl, registerUrl, roomUrl, bookRoomUrl, addBooking } from "./urls";
 
 console.log(roomUrl);
 
@@ -90,11 +90,25 @@ export async function postRegister({
   }
 }
 
-export async function bookRooom() {
+export async function bookRooom(postObj, config) {
   try {
-    const { data } = await axios.post(bookRoomUrl);
+    const { data } = await axios.post(bookRoomUrl, postObj, config);
+    
+    
     return data;
   } catch (err) {
+    console.log("here");
+    console.log(err.response.data);
+    return err.response.status;
+  }
+}
+
+export async function AddBook(postObj, config) {
+  try {
+    const res = await axios.post(addBooking, postObj, config);
+    return res;
+  } catch (err) {
+    console.log("here");
     console.log(err.response.data);
     return err.response.status;
   }

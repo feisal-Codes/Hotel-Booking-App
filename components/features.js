@@ -48,7 +48,7 @@ function Features({onPress}) {
           <Pressable
               style={styles.sParent}
               onPress={() => {
-                console.log("pressed");
+                onPress("Location")
               }}
               android_ripple={{color:"white"}}
             >
