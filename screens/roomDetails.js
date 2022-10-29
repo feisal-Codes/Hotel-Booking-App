@@ -1,19 +1,22 @@
 import { useState } from "react";
 
-import { View, Text, ActivityIndicator, Image, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Alert,
+  SafeAreaView,
+} from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-
-import { Ionicons } from "@expo/vector-icons";
 
 import CalendarPicker from "react-native-calendar-picker";
 import moment from "moment";
-import CustomModal from "../components/customModal";
-import RoomAmenities from "../components/amenities";
 import { Button, Chip } from "@rneui/themed";
-import { bookRoomUrl } from "../util/urls";
 import { bookRooom } from "../util/http";
-
-const ratingsArray = [1, 2, 3, 4, 5];
+import { colors } from "../util/colors";
+import { useSelector } from "react-redux";
 
 const RoomDetails = ({ route, navigation }) => {
   console.log("*************************");
@@ -21,7 +24,7 @@ const RoomDetails = ({ route, navigation }) => {
   // console.log(route.params.price);
   console.log("here here ere here here here");
   console.log(route.params);
-  const data = route.params.data;
+  const data = route.params;
 
   // const description = route.params.data[0].details.desc;
   // console.log(route.params.data[0]);
@@ -33,6 +36,20 @@ const RoomDetails = ({ route, navigation }) => {
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
   const [duration, setDuration] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const state = useSelector(state => {
+    return state.auth;
+  });
+
+  function handlePress() {
+    // navigation.navigate("amenities", {
+    //   screen:'amenity',
+    //   params:{data:data}
+    // });
+    // navigation.navigate("amenities", {
+    //   data:data
+    // });
+  }
 
   function onDateChange(date, type) {
     if (type === "END_DATE") {
@@ -76,74 +93,125 @@ const RoomDetails = ({ route, navigation }) => {
   }
 
   async function handleBooking(type) {
-    
+    try {
+      if (!selectedStartDate) {
+        Alert.alert("", "Select Check in Date");
+        return;
+      }
+      if (!selectedEndDate) {
+        Alert.alert("", "Select Check out Date");
+        return;
+      }
 
-    const bookObj= {
-      startDate:moment.utc(selectedStartDate).format("D/MM/YYYY"),
-      endDate:moment.utc(selectedEndDate).format("D/MM/YYYY"),
-      rtype:type
+      const config = {
+        headers: {
+          Authorization: `Bearer ${state.user ? state.user.token : ""}`,
+        },
+      };
+
+      console.log("auth");
+      console.log(state);
+
+      const bookObj = {
+        startDate: moment.utc(selectedStartDate).format("YYYY-MM-DD"),
+        endDate: moment.utc(selectedEndDate).format("YYYY-MM-DD"),
+        roomType: type,
+      };
+
+      console.log(bookObj, config);
+
+      setIsLoading(true);
+
+      const res = await bookRooom(bookObj, config);
+      if (res) {
+        setIsLoading(false);
+      }
+      if (res == 401 || res == 500) {
+        // setIsLoading(false)
+        throw res;
+      }
+
+      if (res == 400) {
+        throw res;
+      }
+
+      console.log("this is the needed response");
+      console.log(res);
+      console.log("#####################################");
+
+      navigation.navigate("book", {
+        bookingData: res,
+        days: days,
+        bookingDates: bookObj,
+        userId: state.user.id,
+      });
+
+      //navigate to a new screen
+    } catch (err) {
+      console.log("here too");
+      const bookObjerr = {
+        startDate: moment.utc(selectedStartDate).format("DD-MM-YYYY"),
+        endDate: moment.utc(selectedEndDate).format("DD-MM-YYYY"),
+        roomType: type,
+      };
+
+      // if (err.response.data) {
+      //   console.log(err.response.data);
+      // }
+      if (err == 400) {
+        Alert.alert(
+          "",
+          bookObjerr.roomType +
+            " rooms are not available for the duration " +
+            bookObjerr.startDate +
+            " to " +
+            bookObjerr.endDate
+        );
+      } else {
+        Alert.alert("", "Oops! Something Happened, Try Again!");
+      }
+
+      console.log(err);
     }
-
-    console.log(bookObj)
-    
-    // const res= await bookRooom()
-
-
-    // Alert.alert(bookObj)
-    
   }
 
   return (
     <>
-      <ScrollView contentContainerStyle={styles.scrollview}>
-        <View style={styles.main_container}>
-          <View>
-            <Image
-              source={require("../assets/images/hotel.jpg")}
-              style={{ width: "100%", height: 180 }}
-            />
-            <View style={styles.details}>
-              
-              <Button
-                title="View Room Features"
-                onPress={() => setVisible(true)}
-                type="solid"
-                color="#00308F"
-                containerStyle={{ borderRadius: 20 }}
-              />
-               <Button
-                title="View Room Images"
-                onPress={() => setVisible(true)}
-                type="solid"
-                color="#00308F"
-                containerStyle={{ borderRadius: 20 }}
-              />
-            </View>
-          </View>
-        </View>
+      <SafeAreaView>
 
-        {/* <ScrollView contentContainerStyle={styles.scrollview}> */}
-        {/* <Text</Text> */}
-
-        <View style={styles.container}>
-          <CalendarPicker
-            startFromMonday={true}
-            allowRangeSelection={true}
-            minDate={minDate}
-            maxDate={maxDate}
-            todayBackgroundColor="whitesmoke"
-            todayTextStyle={{ color: "black" }}
-            selectedDayColor="#00308F"
-            selectedDayTextColor="#FFFFFF"
-            onDateChange={onDateChange}
-            restrictMonthNavigation={true}
-            // scrollable={true}
-            // horizontal={false}
-            // showDayStragglers={true}
-            nextTitle="Next Month"
-            previousTitle="Previous Month"
-            textStyle={{ color: "black", fontSize: 16 }}
+        
+        <ScrollView contentContainerStyle={styles.scrollview}>
+          <Button
+            title="Select dates"
+            // onPress={handlePress}
+            type="solid"
+            color={colors.textColorGold}
+            size="sm"
+            raised={true}
+            titleStyle={{ color: "black" }}
+            containerStyle={{ marginBottom: 10 }}
           />
+         
+          <View style={styles.container}>
+            <CalendarPicker
+              startFromMonday={true}
+              allowRangeSelection={true}
+              minDate={minDate}
+              maxDate={maxDate}
+              todayBackgroundColor="gold"
+              todayTextStyle={{ color: "black" }}
+              selectedDayColor={colors.primary400}
+              selectedDayTextColor="#FFFFFF"
+              onDateChange={onDateChange}
+              restrictMonthNavigation={true}
+              // scrollable={true}
+              // horizontal={false}
+              // showDayStragglers={true}
+              nextTitle="Next Month"
+              previousTitle="Previous Month"
+              textStyle={{ color: "black", fontSize: 14 }}
+            />
+          </View>
 
           <View style={styles.dates_container}>
             <Text style={styles.text}>
@@ -160,8 +228,7 @@ const RoomDetails = ({ route, navigation }) => {
               </Text>
             }
           </View>
-        </View>
-        <View style={styles.price_calc}>
+          {/* <View style={styles.price_calc}>
           <View style={styles.price_calc_sndchild}>
             <Text>Night(s) Booked: {days}</Text>
             <Text>Price/Night: {data.price}</Text>
@@ -172,24 +239,33 @@ const RoomDetails = ({ route, navigation }) => {
             <Text>Number Of Children: {data.occupancy.children}</Text>
             <Text>Number Of Guests: {data.occupancy.guest}</Text>
           </View>
-        </View>
+        </View> */}
 
-        <View style={styles.custom_buttons}>
-          <Button
-            title="Search for Room Availability"
-            type="solid"
-            color="#00308F"
-            onPress={()=>handleBooking(data.type)}
-          />
-        </View>
-      </ScrollView>
-
-      <CustomModal
+          <View style={styles.custom_buttons}>
+            <Button
+              title="Search Room Availability"
+              type="solid"
+              color={colors.primary400}
+              size="md"
+              onPress={() => handleBooking(data.type)}
+              loading={isLoading}
+              buttonStyle={{ marginBottom: 5 }}
+            />
+          </View>
+        </ScrollView>
+        {isLoading && (
+          <View>
+            
+          <ActivityIndicator size="large" color="#00308F" />
+          </View>
+      )}
+        {/* <CustomModal
         visible={visible}
         setVisible={setVisible}
         RoomAmenities={RoomAmenities}
         data={data}
-      />
+      /> */}
+      </SafeAreaView>
     </>
   );
 };
@@ -207,7 +283,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 5,
     // backgroundColor: "#FCFCFC",
-    marginTop: -25,
+    marginTop: 15,
     // opacity: 0,
     marginHorizontal: 5,
     // borderRadius: 4,
@@ -228,9 +304,12 @@ const styles = StyleSheet.create({
   },
   custom_buttons: {
     flex: 1,
-    flexDirection: "row",
+    // flexDirection: "row",
     padding: 5,
     marginTop: 10,
+    marginBottom: 10,
+    paddingBottom: 10,
+    backgroundColor: "red",
     // justifyContent:"space-around"
   },
   custom_buttons_price: {
@@ -250,12 +329,15 @@ const styles = StyleSheet.create({
 
   scrollview: {
     flexGrow: 1,
-    justifyContent: "space-between",
+
+    // justifyContent: "space-between",
     flexDirection: "column",
-    paddingBottom: 10,
+    // paddingBottom: 10,
+    // backgroundColor:"white"
   },
   main_container: {
     flex: 1,
+    // backgroundColor:"white"
   },
 
   container: {
@@ -283,12 +365,12 @@ const styles = StyleSheet.create({
     color: "#00308F",
   },
   price_calc: {
-    flexDirection:"row",
+    flexDirection: "row",
     backgroundColor: "whitesmoke",
     paddingVertical: 10,
     marginHorizontal: 5,
     borderRadius: 5,
-    justifyContent:"space-between"
+    justifyContent: "space-between",
   },
   price_calc_child: {
     flexDirection: "row",
@@ -308,10 +390,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     marginTop: 10,
     justifyContent: "flex-end",
+
     borderRadius: 10,
   },
   custom_buttons_book: {
     flexBasis: "100%",
+    marginTop: 10,
     justifyContent: "flex-end",
   },
 });
